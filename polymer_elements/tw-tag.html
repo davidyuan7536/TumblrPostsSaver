@@ -1,0 +1,84 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<dom-module id="tw-tag">
+  <template>
+    <style>
+      :host {
+      }
+
+      .tagContainer{
+        padding: 0.5rem;
+        background-color: #424242;
+        color: #fff;
+        border-radius: 0.2rem;
+      }
+
+      iron-icon{
+        width: 1.5rem;
+        color: fff;
+        margin-right: 0.4rem;
+      }
+
+      iron-icon:hover{
+        cursor: pointer;
+        -webkit-animation-name: spin;
+        -webkit-animation-duration: 500ms;
+        -webkit-animation-iteration-count: 1;
+        -webkit-animation-timing-function: linear;
+        -moz-animation-name: spin;
+        -moz-animation-duration: 500ms;
+        -moz-animation-iteration-count: 1;
+        -moz-animation-timing-function: linear;
+        -ms-animation-name: spin;
+        -ms-animation-duration: 500ms;
+        -ms-animation-iteration-count: 1;
+        -ms-animation-timing-function: linear;
+
+        animation-name: spin;
+        animation-duration: 500ms;
+        animation-iteration-count: 1;
+        animation-timing-function: linear;
+
+      }
+
+      @-moz-keyframes spin {
+          from { -moz-transform: rotate(0deg); }
+          to { -moz-transform: rotate(360deg); }
+      }
+      @-webkit-keyframes spin {
+          from { -webkit-transform: rotate(0deg); }
+          to { -webkit-transform: rotate(360deg); }
+      }
+      @keyframes spin {
+          from {transform:rotate(0deg);}
+          to {transform:rotate(360deg);}
+      }
+
+    </style>
+
+      <span class = "tagContainer" >{{tag}}
+        <iron-icon  on-tap="removeTag" icon="cancel" id = "deleteTag"></iron-icon>
+      </span>
+
+
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'tw-tag',
+
+      properties: {
+        tag:{
+          type: String,
+          default: ""
+        },
+         index:Number
+      },
+      removeTag: function() {
+          this.fire('removeTag', {index: this.index});
+       }
+
+    });
+  </script>
+</dom-module>

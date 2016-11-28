@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Headspace Challenge</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://unpkg.com/masonry-layout@4.1/dist/masonry.pkgd.min.js"></script>
+    <script src="bower_components/webcomponentsjs/webcomponents.js"></script>
+
+    <link rel="import" href="polymer_elements/tw-text.html">
+    <link rel="import" href="polymer_elements/tw-photo.html">
+    <link rel="import" href="polymer_elements/tw-search.html">
+    <link rel="import" href="bower_components/paper-button/paper-button.html">
+    <link rel="import" href="bower_components/paper-tabs/paper-tabs.html">
+    <link rel="import" href="bower_components/paper-input/paper-input.html">
+    <link rel="import" href="bower_components/iron-icon/iron-icon.html">
+    <link rel="import" href="bower_components/paper-icon-button/paper-icon-button.html">
+    <link rel="import" href="bower_components/iron-icons/iron-icons.html">
+    <link rel="import" href="bower_components/iron-pages/iron-pages.html">
+
+    <script src="script.js"></script>
+    <link rel="stylesheet" href="index.css">
+
+  </head>
+  <body>
+  	<!-- Search bar -->
+    <div class="col-xs-12">
+      <div style = "background-color: #fff">
+        <tw-search></tw-search>
+      </div>
+      <template is="dom-bind" id="scope">
+        <div class = "col-xs-12">
+          <paper-tabs selected="{{key}}" no-bar>
+            <paper-tab>POSTS</paper-tab>
+            <paper-tab>FAVORITES</paper-tab>
+          </paper-tabs>
+        </div>
+        <iron-pages selected={{key}}>
+          <div id="tumblr_results" class="container"><h1>No Posts to Show<h1></div>
+          <div id="favorites" class="container"><h1>No Favorites<h1></div>
+        </iron-pages>
+      </template>
+    </div>
+
+
+
+
+
+  	<!-- Div that holds results for tumblr search -->
+  	<!-- <h1 id="title_tumblr"> INSERT A TUMBLR URL </h1>
+  	<h2 id="tumblr_desc"></h2> -->
+
+
+  </body>
+</html>

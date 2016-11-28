@@ -1,0 +1,97 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<dom-module id="tw-quote">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      #postWrap{
+        box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+        transition: 0.3s;
+        padding: 0rem 1rem 1rem 1rem;
+        margin-bottom: 1rem;
+        background-color: #fff;
+      }
+      #postWrap:hover{
+        cursor: pointer;
+        box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+      }
+      div{
+        overflow: auto;
+      }
+      paper-icon-button{
+        color: #ff3366;
+        position: relative;
+        float: right;
+      }
+
+
+
+    </style>
+
+    <div id = "postWrap">
+      <paper-icon-button icon="favorite" on-tap = "favorite" title="heart"></paper-icon-button>
+      <div id = "postText"></div>
+      <div id = "postSource"></div>
+    </div>
+
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'tw-quote',
+
+      properties: {
+        text:{
+          type: String,
+          observer: '_textChanged'
+        },
+        source:{
+          type: String,
+          observer: '_sourceChanged'
+        },
+        favorited:{
+          type: Boolean,
+          default: false,
+          observer: '_favoritedChanged'
+        }
+      },
+      ready: function() {
+      },
+      favorite: function(){
+        if(this.favorited){
+          this.remove();
+          if($('#favorites').html() == ""){
+            $('#favorites').html("<h1>No Favorites</h1><h1></h1>");
+          }
+          return;
+        }
+        var dynamicEl = document.createElement("tw-quote");
+        dynamicEl.text = this.text;
+        dynamicEl.source = this.source;
+        dynamicEl.favorited = true;
+        if($('#favorites').html() === "<h1>No Favorites</h1><h1></h1>"){
+          $('#favorites').empty();
+        }
+        $('#favorites').append(dynamicEl);
+      },
+      _textChanged: function(newValue, oldValue){
+        var postText = this.$.postText;
+        $(postText).append(newValue);
+      },
+      _sourceChanged: function(newValue, oldValue){
+        var postSource = this.$.postSource;
+        $(postSource).append(newValue);
+      },
+      _favoritedChanged: function(newValue, oldValue){
+        if(newValue){
+          var icon = Polymer.dom(this.root).querySelector('paper-icon-button');
+          icon.icon = "delete";
+        }
+      }
+
+    });
+  </script>
+</dom-module>

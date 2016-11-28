@@ -1,0 +1,99 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-resizable-behavior/iron-resizable-behavior.html">
+
+
+<dom-module id="tw-photo">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      #postWrap{
+        box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+        transition: 0.3s;
+        padding: 0rem 1rem 1rem 1rem;
+        margin-bottom: 1rem;
+        background-color: #fff;
+      }
+      #postWrap:hover{
+        cursor: pointer;
+        box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+      }
+      img{
+        width: 100%;
+      }
+      div{
+        overflow: auto;
+      }
+      paper-icon-button{
+        color: #ff3366;
+        position: relative;
+        float: right;
+      }
+
+
+
+    </style>
+
+    <div id = "postWrap">
+      <paper-icon-button icon="favorite" on-tap = "favorite" title="heart"></paper-icon-button>
+      <template is="dom-repeat" items="{{photos}}">
+        <img src= "{{item.original_size.url}}" />
+      </template>
+      <div id = "photoCaption"></div>
+    </div>
+
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'tw-photo',
+
+      properties: {
+        photos:{
+          type: Array
+        },
+        caption:{
+          type: String,
+          observer: '_captionChanged'
+        },
+        favorited:{
+          type: Boolean,
+          default: false,
+          observer: '_favoritedChanged'
+        }
+      },
+      ready: function() {
+      },
+      favorite: function(){
+        if(this.favorited){
+          this.remove();
+          if($('#favorites').html() == ""){
+            $('#favorites').html("<h1>No Favorites</h1><h1></h1>");
+          }
+          return;
+        }
+        var dynamicEl = document.createElement("tw-photo");
+        dynamicEl.photos = this.photos;
+        dynamicEl.caption = this.caption;
+        dynamicEl.favorited = true;
+        if($('#favorites').html() === "<h1>No Favorites</h1><h1></h1>"){
+          $('#favorites').empty();
+        }
+        $('#favorites').append(dynamicEl);
+      },
+      _captionChanged: function(newValue, oldValue) {
+        var photoCaption = this.$.photoCaption;
+        $(photoCaption).append(newValue);
+      },
+      _favoritedChanged: function(newValue, oldValue){
+        if(newValue){
+          var icon = Polymer.dom(this.root).querySelector('paper-icon-button');
+          icon.icon = "delete";
+        }
+      }
+
+    });
+  </script>
+</dom-module>

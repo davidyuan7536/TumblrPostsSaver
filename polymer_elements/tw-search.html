@@ -1,0 +1,215 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="tw-tag.html">
+
+
+<dom-module id="tw-search">
+  <template>
+    <style>
+      :host {
+        display: block;
+        --paper-input-container-focus-color: #424242;
+      }
+
+      .search{
+        float: right;
+        background-color: #424242;
+        color: #fff;
+        margin-bottom: 2rem;
+      }
+
+      #tagsField{
+        display: inline-block;
+        line-height: 2.5;
+      }
+
+      #urlInput{
+        margin-bottom: 2rem;
+      }
+
+    </style>
+
+    <div class = "col-md-12">
+      <paper-input id = "urlInput" label="Enter Tumblr Name or URL"></paper-input>
+
+        <template is="dom-repeat" items="{{tags}}">
+          <span id = "tagsField"><tw-tag tag = "{{item}}"  index = "{{index}}" ></tw-tag> </span>
+        </template>
+
+      <paper-input error-message="{{emptyErrorMessage}}" on-keydown="keyDown" value="{{inputValue}}" id = "tagsInput" label="Tags (Press enter when done)"></paper-input>
+      <paper-button on-tap="search" class = "search">Search</paper-button>
+    </div>
+
+
+
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'tw-search',
+
+      properties: {
+        tags:{
+          type:Array,
+          notify: true,
+          value:function(){return []},
+        },
+        emptyErrorMessage:{
+          type:String,
+          value:"Tag cannot be empty"
+        },
+        duplicateErrorMessage:{
+          type:String,
+          value:"Tag must be identical"
+        },
+
+        inputValue: String
+      },
+
+      listeners: {
+          'removeTag': 'onRemoveTag'
+      },
+
+      ready: function() {
+
+      },
+
+
+      addTag: function(tag){
+        var input = this.$.tagsInput;
+        if (typeof(this.tags) == 'undefined'){
+          this.tags = [];
+        }
+        if (tag == ""){
+
+          input.errorMessage = this.emptyErrorMessage;
+          input.invalid=true;
+          return;
+        }
+        else if (this.tags.indexOf(tag) >= 0){
+
+          input.errorMessage = this.duplicateErrorMessage;
+          input.invalid=true;
+          return;
+        }
+
+        this.push('tags', tag);
+        this.inputValue = "";
+        input.invalid=false;
+      },
+
+      getTag: function(){
+        return this.inputValue.trim();
+      },
+
+      keyDown: function(e) {
+        var keyVal = e.which;
+        if (keyVal == 13){
+          this.addTag(this.getTag());
+        }
+        else{
+          var input = this.$.tagsInput;
+          input.invalid=false;
+        }
+      },
+
+      onRemoveTag: function(e) {
+          this.splice('tags', e.detail.index, 1);
+      },
+
+      search: function(){
+
+        $('#tumblr_results').empty();
+        var urlTumblrRaw = $(this.$.urlInput).val();
+        var urlTumblr = urlTumblrRaw.replace(/.*?:\/\//g, "");
+        if (urlTumblr.indexOf('.tumblr.com') === -1)
+        {
+          urlTumblr = urlTumblr.concat(".tumblr.com");
+        }
+        console.log(urlTumblr);
+        var client =  '3SvqbwLKCNuZHTJidWIb5V6Oc1Ah2eTWGhUPSqwNo2S0lTgIoD';
+        var queryURL;
+        var queryData;
+        var urlInput = this.$.urlInput;
+        var tagSearch = false;
+        if($(urlInput).val() === ""){
+          if(typeof(this.tags) == 'undefined'){
+            alert("Please enter a tumblr URL or a tag");
+            $('#tumblr_results').html("<h1>No Posts to Show</h1><h1></h1>");
+            return;
+          }
+          else if(this.tags.length === 0){
+            alert("Please enter a tumblr URL or a tag");
+            $('#tumblr_results').html("<h1>No Posts to Show</h1><h1></h1>");
+            return;
+          }
+        }
+
+        if($(urlInput).val() === ""){
+          queryURL = 'http://api.tumblr.com/v2/tagged';
+          queryData = {api_key: client, tag : this.tags[0]};
+          tagSearch = true;
+        }
+        else{
+          queryURL = 'http://api.tumblr.com/v2/blog/' + urlTumblr.replace('/', '') + '/posts';
+          queryData = { api_key: client, limit : 20, tag : this.tags}
+        }
+        $.ajax({
+          url: queryURL,
+          method: 'get',
+          dataType: "jsonp",
+          data: (queryData),
+          success: function(data){
+              console.log(data);
+              if((data.response).length === 0){
+                $('#tumblr_results').html('no data returned, make sure you entered a Tumblr url');
+              }
+
+             var objectPosts;
+             if(tagSearch){
+                objectPosts = data.response;
+             }
+             else{
+               objectPosts = data.response.posts;
+             }
+             if(objectPosts.length === 0){
+                $('#tumblr_results').html("<h1>No Posts to Show</h1><h1></h1>");
+                return;
+             }
+
+             $.each(objectPosts, function(key, value){
+               if(value.type === "text"){
+                 var dynamicEl = document.createElement("tw-text");
+                 dynamicEl.title = value.title;
+                 dynamicEl.body = value.body;
+                 $('#tumblr_results').append(dynamicEl);
+               }
+               else if(value.type === "photo"){
+                  var dynamicEl = document.createElement("tw-photo");
+                  dynamicEl.photos = value.photos;
+                  dynamicEl.caption = value.caption;
+                  $('#tumblr_results').append(dynamicEl);
+               }
+               else if(value.type === "quote"){
+                  var dynamicEl = document.createElement("tw-quote");
+                  dynamicEl.text = value.text;
+                  dynamicEl.source = value.source;
+                  $('#tumblr_results').append(dynamicEl);
+               }
+
+             });
+             if($('#tumblr_results').html() === ""){
+               alert("Results contain only posts with types that I have not implemented");
+
+             }
+           },
+           error: function(){
+               $('#tumblr_results').html("<h1>No Posts to Show</h1><h1></h1>");
+           }
+
+          });
+      }
+
+    });
+  </script>
+</dom-module>
